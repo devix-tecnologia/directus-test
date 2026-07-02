@@ -1,0 +1,39 @@
+# Ambiente efêmero para testar o cache do Directus com Redis.
+# Sem persistência em nenhum dos dois serviços: o banco do Directus (SQLite)
+# vive em tmpfs e o Redis roda sem RDB/AOF. Tudo é descartado ao derrubar
+# o compose.
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    tmpfs:
+      - /data
+    ports:
+      - "6379"
+
+  directus:
+    image: directus/directus:11
+    depends_on:
+      - redis
+    tmpfs:
+      - /directus/database:uid=1000,gid=1000
+      - /directus/uploads:uid=1000,gid=1000
+    environment:
+      KEY: ${DIRECTUS_KEY:-2f0e5a1c-6b1e-4c8e-9c1a-3d2b7f6e9a10}
+      SECRET: ${DIRECTUS_SECRET:-5b8e1d2f-4a3c-4e7d-9f0a-1c2b3d4e5f60}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-d1r3ctus-teste}
+      DB_CLIENT: sqlite3
+      DB_FILENAME: /directus/database/data.db
+      CACHE_ENABLED: "true"
+      CACHE_STORE: redis
+      REDIS: redis://redis:6379
+      CACHE_NAMESPACE: directus-test-cache
+      CACHE_AUTO_PURGE: "true"
+      CACHE_STATUS_HEADER: X-Directus-Cache-Status
+      CACHE_TTL: ${CACHE_TTL:-1h}
+      WEBSOCKETS_ENABLED: "false"
+      TELEMETRY: "false"
+    ports:
+      - "8055"
