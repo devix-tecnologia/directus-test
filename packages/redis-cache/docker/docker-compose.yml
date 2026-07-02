@@ -35,5 +35,8 @@ services:
       CACHE_TTL: ${CACHE_TTL:-1h}
       WEBSOCKETS_ENABLED: "false"
       TELEMETRY: "false"
+      # trace é necessário para o Directus logar cada query SQL (com duração) —
+      # usado pelos testes de observabilidade para contar chamadas ao banco.
+      LOG_LEVEL: ${LOG_LEVEL:-trace}
     ports:
       - "8055"

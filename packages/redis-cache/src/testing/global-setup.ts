@@ -18,6 +18,7 @@ declare module "vitest" {
     colecao: string;
     redisHost: string;
     redisPort: number;
+    directusContainerId: string;
   }
 }
 
@@ -37,6 +38,7 @@ export default async function setup(project: TestProject): Promise<() => Promise
   const fixtures = await criarFixturesDeCache(ambiente.baseUrl, tokenAdmin);
 
   const redisContainer = ambiente.ambiente.getContainer(chaveContainer("redis"));
+  const directusContainer = ambiente.ambiente.getContainer(chaveContainer("directus"));
 
   project.provide("baseUrl", ambiente.baseUrl);
   project.provide("tokenAdmin", tokenAdmin);
@@ -45,6 +47,7 @@ export default async function setup(project: TestProject): Promise<() => Promise
   project.provide("colecao", fixtures.colecao);
   project.provide("redisHost", redisContainer.getHost());
   project.provide("redisPort", redisContainer.getMappedPort(6379));
+  project.provide("directusContainerId", directusContainer.getId());
 
   return async () => {
     await ambiente.parar();

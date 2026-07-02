@@ -21,6 +21,18 @@ dados de teste.
   que precisam fazer login na interface administrativa do Directus.
   `playwright` é `peerDependency` opcional — só é necessário para quem usa
   este helper.
+- **`observability`** — visibilidade sobre onde uma requisição realmente
+  "passou":
+  - `obterEstatisticasRedis()` / `diferencaDeChamadas()`: lê `INFO
+    commandstats` do Redis e permite tirar um snapshot antes/depois para
+    saber quantos `GET`/`SET`/etc. um teste efetivamente disparou.
+  - `obterLogsDesde()` / `contarQueriesSql()`: lê os logs do container do
+    Directus desde um instante (via `docker logs --since`) e conta quantas
+    linhas correspondem a queries SQL — o Directus loga cada query com sua
+    duração quando `LOG_LEVEL=trace` (ver `database/index.ts` do próprio
+    Directus). Não depende de OpenTelemetry: o Directus só instrumenta OTEL
+    para chamadas de IA (Langfuse/Braintrust), não para requisições HTTP,
+    cache ou banco.
 
 ## Uso típico
 

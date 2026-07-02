@@ -15,6 +15,13 @@ mocks.
    coleção invalida o cache da consulta.
 4. **ttl** — o TTL da chave gravada no Redis (inspecionado via `ioredis`)
    condiz com `CACHE_TTL` configurado no Directus.
+5. **observabilidade** — prova numericamente (não só pelo header
+   `X-Directus-Cache-Status`) que um `MISS` de fato consulta o banco e
+   grava no Redis (`SET` > 0, queries SQL > 0 nos logs do container), e que
+   o `HIT` seguinte só lê do Redis (`GET` > 0, `SET` = 0, 0 queries SQL) —
+   usando `@directus-test/sdk`'s `obterEstatisticasRedis`/`diferencaDeChamadas`
+   e `obterLogsDesde`/`contarQueriesSql`. O compose deste pacote roda com
+   `LOG_LEVEL=trace` para viabilizar essa contagem de queries.
 
 ## Rodar
 

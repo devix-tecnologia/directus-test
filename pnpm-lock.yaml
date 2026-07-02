@@ -39,6 +39,9 @@ importers:
 
   packages/sdk:
     dependencies:
+      ioredis:
+        specifier: ^5.4.1
+        version: 5.11.1
       testcontainers:
         specifier: ^10.16.0
         version: 10.28.0
