@@ -1,5 +1,6 @@
 import {
-  contarQueriesSql,
+  aguardarLogs,
+  contarQueriesParaTabela,
   diferencaDeChamadas,
   directusFetch,
   obterEstatisticasRedis,
@@ -39,10 +40,9 @@ describe("observabilidade: quantas vezes o cache toca o Redis e o banco", () => 
     const respostaMiss = await directusFetch(baseUrl, caminho, { token });
     expect(respostaMiss.headers.get(CACHE_STATUS_HEADER)).toBe("MISS");
 
-    // dá um respiro para o log assíncrono do container ser escrito
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await aguardarLogs();
 
-    const queriesNoMiss = contarQueriesSql(obterLogsDesde(containerId, inicioMiss));
+    const queriesNoMiss = contarQueriesParaTabela(obterLogsDesde(containerId, inicioMiss), colecao);
     expect(queriesNoMiss).toBeGreaterThan(0);
 
     const estatisticasDepoisMiss = await obterEstatisticasRedis(redis);
@@ -55,9 +55,9 @@ describe("observabilidade: quantas vezes o cache toca o Redis e o banco", () => 
     const respostaHit = await directusFetch(baseUrl, caminho, { token });
     expect(respostaHit.headers.get(CACHE_STATUS_HEADER)).toBe("HIT");
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await aguardarLogs();
 
-    const queriesNoHit = contarQueriesSql(obterLogsDesde(containerId, inicioHit));
+    const queriesNoHit = contarQueriesParaTabela(obterLogsDesde(containerId, inicioHit), colecao);
     expect(queriesNoHit).toBe(0);
 
     const estatisticasDepoisHit = await obterEstatisticasRedis(redis);

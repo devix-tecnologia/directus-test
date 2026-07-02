@@ -92,7 +92,7 @@ export async function subirAmbienteDirectus(
     portaDirectus = 8055,
     caminhoHealthcheck = "/server/health",
     env = {},
-    timeoutMs = 120_000,
+    timeoutMs = 180_000,
   } = opts;
 
   let ambienteCompose = new DockerComposeEnvironment(composeFilePath, composeFile).withWaitStrategy(

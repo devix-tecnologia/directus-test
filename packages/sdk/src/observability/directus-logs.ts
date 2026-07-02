@@ -20,3 +20,28 @@ export function obterLogsDesde(containerId: string, desde: Date): string[] {
 export function contarQueriesSql(linhas: string[]): number {
   return linhas.filter((linha) => PADRAO_QUERY_SQL.test(linha)).length;
 }
+
+/**
+ * Conta apenas as queries que tocam uma tabela/coleção específica.
+ *
+ * O Directus consulta o banco em toda requisição autenticada só para
+ * resolver accountability/permissões do token (`getAccountabilityForToken`),
+ * independente de a resposta ser HIT ou MISS de cache. `contarQueriesSql`
+ * pegaria essa query de autenticação junto com as de dados de verdade — use
+ * esta função quando o que importa é "quantas vezes os DADOS da coleção X
+ * foram buscados no banco", não "houve alguma atividade no banco".
+ */
+export function contarQueriesParaTabela(linhas: string[], tabela: string): number {
+  const padraoTabela = new RegExp(`["'\`]?${tabela}["'\`]?`, "i");
+
+  return linhas.filter((linha) => PADRAO_QUERY_SQL.test(linha) && padraoTabela.test(linha)).length;
+}
+
+/**
+ * Espera o log assíncrono do container ser escrito antes de ler com
+ * `obterLogsDesde`. Sem isso, uma leitura logo após a requisição pode
+ * não ver a linha da query ainda.
+ */
+export function aguardarLogs(ms = 500): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
