@@ -26,13 +26,26 @@ dados de teste.
   - `obterEstatisticasRedis()` / `diferencaDeChamadas()`: lê `INFO
     commandstats` do Redis e permite tirar um snapshot antes/depois para
     saber quantos `GET`/`SET`/etc. um teste efetivamente disparou.
-  - `obterLogsDesde()` / `contarQueriesSql()`: lê os logs do container do
-    Directus desde um instante (via `docker logs --since`) e conta quantas
-    linhas correspondem a queries SQL — o Directus loga cada query com sua
-    duração quando `LOG_LEVEL=trace` (ver `database/index.ts` do próprio
-    Directus). Não depende de OpenTelemetry: o Directus só instrumenta OTEL
-    para chamadas de IA (Langfuse/Braintrust), não para requisições HTTP,
-    cache ou banco.
+  - `obterLogsDesde()` / `contarQueriesSql()` / `contarQueriesParaTabela()`:
+    lê os logs do container do Directus desde um instante (via `docker logs
+    --since`) e conta quantas linhas correspondem a queries SQL — o
+    Directus loga cada query com sua duração quando `LOG_LEVEL=trace` (ver
+    `database/index.ts` do próprio Directus). Não depende de OpenTelemetry:
+    o Directus só instrumenta OTEL para chamadas de IA (Langfuse/Braintrust),
+    não para requisições HTTP, cache ou banco.
+    **Prefira `contarQueriesParaTabela()`** para asserções — o Directus roda
+    uma query de resolução de accountability/permissões em *toda*
+    requisição autenticada, mesmo em cache HIT, então `contarQueriesSql()`
+    genérico conta essa query "de sistema" junto com as de dados de
+    verdade. `contarQueriesParaTabela(linhas, colecao)` filtra só o que
+    toca a tabela que importa para o teste.
+  - `aguardarLogs()`: dá um respiro (500ms por padrão) para o log
+    assíncrono do container assentar antes de ler com `obterLogsDesde()`.
+    Chame isso **antes** de marcar o timestamp de início de uma janela que
+    você espera ter zero queries — caso contrário uma query da chamada
+    anterior, ainda não escrita no log, pode ser contada como se fosse da
+    janela seguinte (foi exatamente esse tipo de corrida que causou um
+    teste flaky na prática).
 
 ## Uso típico
 
