@@ -1,6 +1,12 @@
 {
   "name": "directus-test",
   "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Sidarta Veloso",
+    "email": "sidartaveloso@gmail.com",
+    "url": "https://sidartaveloso.com"
+  },
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",

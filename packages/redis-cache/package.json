@@ -2,7 +2,12 @@
   "name": "@directus-test/redis-cache",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "author": {
+    "name": "Sidarta Veloso",
+    "email": "sidartaveloso@gmail.com",
+    "url": "https://sidartaveloso.com"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",
